@@ -25,7 +25,7 @@ SECRET_KEY = '_us61^&(qdtx56nqkeuo=0cr2no4#&5(5(l#()i33u5_+=ios2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = ['testserver', 'localhost']
 
 
 # Application definition

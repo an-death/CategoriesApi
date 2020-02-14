@@ -1,3 +1,4 @@
+import json
 from contextlib import contextmanager
 
 from rest_framework import status
@@ -86,3 +87,42 @@ class CategoriesGetTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected_response_data)
+
+
+class CategoryTreePostTestCase(APITestCase):
+
+    def setUp(self):
+        Category.objects.all().delete()
+
+    def test_create_category_tree(self):
+        created_category_count = 4
+        input_data = {
+            'name': 'test1',
+            'children': [
+                {
+                    'name': 'test1.1',
+                    'children': [
+                        {
+                            'name': 'test1.1.1'
+                        }
+                    ]
+                },
+                {
+                    'name': 'test1.2'
+                }
+            ]
+        }
+        data = json.dumps(input_data)
+        resp = self.client.post('/categories/', data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json()['created'], created_category_count)
+
+    def test_except_name_conflict_in_create(self):
+        category_name = 'test1'
+        Category(name=category_name).save()
+        data = json.dumps({'name': category_name})
+        resp = self.client.post('/categories/', data=data, content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(category_name in resp.json()['error'])

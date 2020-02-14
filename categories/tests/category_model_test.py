@@ -1,8 +1,6 @@
 from django.test import TestCase
 
-import django.db.utils as db
-
-from categories.models import Category
+from categories.models import Category, NameConflictError
 
 
 class CategoryModelTestCase(TestCase):
@@ -15,7 +13,7 @@ class CategoryModelTestCase(TestCase):
 
     def test_unique_name_field(self):
         badcat = Category(name='test1')
-        self.assertRaises(db.IntegrityError, badcat.save)
+        self.assertRaises(NameConflictError, badcat.save)
 
     def test_get_parent(self):
         self.assertIsNone(self.c1.parent, msg='c1 has parent but must not')
