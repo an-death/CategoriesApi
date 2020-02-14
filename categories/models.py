@@ -1,3 +1,14 @@
 from django.db import models
 
-# Create your models here.
+
+class Category(models.Model):
+    name = models.CharField(max_length=600, unique=True)
+    parent = models.ForeignKey('Category', null=True, on_delete=models.CASCADE)
+
+    def get_children(self):
+        return Category.objects.filter(parent=self)
+
+    def get_siblings(self):
+        return Category.objects \
+            .filter(parent=self.parent)\
+            .exclude(id=self.id)
