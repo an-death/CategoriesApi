@@ -1,0 +1,31 @@
+1) Categories Table
+    - Only one table
+        Category:
+            Fields: Id, Name (Uniq), ParentId (Null/Id)
+        (does django support recursive index?)
+
+    - Two tables
+        Category:
+            Fields: Id, Name (uniq)
+        Links: (One-to-Many)
+            Fields:
+                Id: FK:Category.Id,
+                Parent: FK:Category.ID  -- Need to indexing this field?
+
+2) Save (Post)
+    From json-tree depth-first -> List: Category
+
+    - Transaction? To have a ParentId and validate Name by Base
+    - Pre-validation of names? Validate uniq for current session and for all indices? Hell no.
+
+3) Get <id>
+    { id , name ,
+        parents : get .ParentId
+        children: get where ParentId == .id
+        siblings: get where ParentId == .ParentId
+    }
+
+4) Optimizations
+    - Only single requests for Get instead of 4+
+            - temp table?
+            - joins?
