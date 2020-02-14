@@ -3,6 +3,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=600, unique=True)
+    # is that required to be a OneToMany?
     parent = models.ForeignKey('Category', null=True, on_delete=models.CASCADE)
 
     def get_children(self):
