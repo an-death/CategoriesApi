@@ -122,6 +122,11 @@ class CategoryTreePostTestCase(APITestCase):
         category_name = 'test1'
         Category(name=category_name).save()
         data = json.dumps({'name': category_name})
+        # Interesting fact that DRF.APIRequestFactory
+        # overwrite `_encode_data` method of DjangoRequestFactory
+        # and if `content_type` provided (which provided always by default == multipart)
+        # it will encode all passed `data` to bytestring.
+        # It is completely fails Liskov Substitution principle. Nice!
         resp = self.client.post('/categories/', data=data, content_type='application/json')
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

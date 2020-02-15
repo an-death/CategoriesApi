@@ -10,7 +10,7 @@ class NameConflictError(Exception):
                f'Category with name "{self._category_name}" already exist'
 
     def json(self):
-        return {'error': repr(self)}
+        return {'error': repr(self), 'name': self._category_name}
 
 
 class Category(models.Model):
