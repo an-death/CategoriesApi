@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from categories.models import Category, NameConflictError
 from categories.tree import depth_first_create_category
-
+from categories.validators import Validator, UniqueCategoriesNameInRequest, UniqueCategoriesNameInDB
 
 logger = logging.getLogger(__file__)
 
@@ -26,9 +26,23 @@ class CategoriesTreeSerializer(serializers.ModelSerializer):
     children = CategorySerializer(many=True, source='get_children')
     siblings = CategorySerializer(many=True, source='get_siblings')
 
-    # here could be added some validators
-    # but i'm not sure it is necessary, see branch:validators
-    default_validators: 'Validator' = []
+    # I'm not sure about all of this.
+    # You cannot drop the transaction,
+    # if something happens during the process
+    # you should rollback all changes no matter
+    # temporary error was or not.
+    # That's lead us to all Validators below are redundant.
+    # The benefits from them are ghostly, but
+    # problems are obvious:
+    # - More code for test and maintain
+    # - Same logic splitted on two difference palaces
+    # - If count of valid requests exceeds the number of non-valid
+    #   it is added additional load because of redundant.
+    # - Need to add index on `name` field which will increase mem consumption by BD
+    default_validators: Validator = [
+        UniqueCategoriesNameInRequest,
+        UniqueCategoriesNameInDB,
+    ]
 
     class Meta:
         model = Category
