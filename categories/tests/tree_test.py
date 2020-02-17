@@ -1,8 +1,6 @@
-from operator import attrgetter
-
 from django.test import TestCase
 
-from categories.tree import depth_first_create_category
+from categories.tree import traverse_depth_first
 
 
 class CategoryTreeTestCase(TestCase):
@@ -29,6 +27,8 @@ class CategoryTreeTestCase(TestCase):
         )
 
     def test_depth_first_category_formatting(self):
-        result = depth_first_create_category(self.input_tree)
-        result = map(attrgetter('name'), result)
+        child_getter = lambda tree: tree.get('children', ())
+        node_builder = lambda tree, _: tree['name']
+        result = traverse_depth_first(node_builder, child_getter, self.input_tree)
+
         self.assertEqual(self.expected_output, tuple(result))

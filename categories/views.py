@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from categories.models import Category, NameConflictError
-from categories.tree import depth_first_create_category
-
+from categories.tree import traverse_depth_first
 
 logger = logging.getLogger(__file__)
 
@@ -56,7 +55,9 @@ class CategoriesTreeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def _create_categories(categories_tree: dict) -> Iterable[Category]:
-        categories = depth_first_create_category(categories_tree)
+        children_getter = lambda tree: tree.get('children', ())
+        category_builder = lambda tree, parent: Category(name=tree['name'], parent=parent)
+        categories = traverse_depth_first(category_builder, children_getter, categories_tree)
         categories = tuple(categories)
         _ = tuple(map(methodcaller('save'), categories))
         return categories
