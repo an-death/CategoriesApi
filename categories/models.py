@@ -18,10 +18,10 @@ class Category(models.Model):
     # is that required to be a OneToMany?
     # if it is, so that this field should be extracted to a
     # ManyToMany-RelationMapping table
-    parent = models.ForeignKey('Category', null=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey('Category', null=True, on_delete=models.CASCADE, related_name='children')
 
     def get_children(self):
-        return Category.objects.filter(parent=self)
+        return self.children.all()
 
     def get_siblings(self):
         return Category.objects \

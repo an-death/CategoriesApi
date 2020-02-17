@@ -57,7 +57,8 @@ class CategoriesTreeSerializer(serializers.ModelSerializer):
     @staticmethod
     def _create_categories(categories_tree: dict) -> Iterable[Category]:
         categories = depth_first_create_category(categories_tree)
-        categories = map(methodcaller('save'), categories)
+        categories = tuple(categories)
+        _ = tuple(map(methodcaller('save'), categories))
         return categories
 
 
